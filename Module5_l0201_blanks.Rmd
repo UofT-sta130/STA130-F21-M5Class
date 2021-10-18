@@ -1,0 +1,245 @@
+---
+title: "Module 5 synchronous class code (complete)"
+output:
+  pdf_document: default
+---
+
+# Hints
+
+-   [The information for the quiz](https://q.utoronto.ca/courses/235890/pages/m5-quiz-and-problem-set-data-text-only?module_item_id=3051913) intentionally includes some sample code that you might find helpful for your problem set. Don't forget about it just because the quiz is over.
+
+-   Problem set 5 has some questions that are meant to be revision for earlier modules. E.g., mean vs median for skewed data, what histograms and boxplots do and don't show. If you're having trouble with any of the early parts of question 1, make sure you look back at your notes and ask if you get stuck as this is also good revision for the midterm and future project.
+
+# Set up
+
+-   Load the `tidyverse` package.
+
+-   Load and save the two dataset you need for the problem set,
+
+    -   `ps5_sample_data.csv` (call it `orig_sample`), and
+
+    -   `ps5_census_data.csv` (call it `census`).
+
+-   Glimpse the `census` data.
+
+```{r, message = FALSE}
+
+```
+
+# Programming tip: How do you make a code chunk?
+
+You can insert an R code chunk either using the RStudio toolbar (the Insert button) or the keyboard shortcut Ctrl + Alt + I (Cmd + Option + I on macOS). [^1]
+
+[^1]: Source: *R Markdown: The Definitive Guide*. (2021-04-09). Yihui Xie, J. J. Allaire, Garrett Grolemund, <https://bookdown.org/yihui/rmarkdown/r-code.html>
+
+# Stats mini-check
+
+Proportions and probabilities come in different flavours. One important 'flavour' is **conditional probabilities**. It is the probability of one event occurring, given that another event/assumption is true.
+
+So I might have a simple (also called marginal) probability, like "The probability of passing STA130 is 80%" but, I might want to instead focus just on students who make consistent effort in the course and make a statement like "Given a student completes all 9 problem sets, the probability they pass STA130 is 99%".
+
+A common 'clue' word, that lets us know we might be looking for a conditional probability is 'of'. For example, "**OF** employed (`q11`) people in Representaville, USA, what proportion changed jobs (`changed_employers_q12c`)?" We'll look at this in the next part.
+
+\newpage
+
+# Teaching world
+
+Suppose that **Dataset 1 (census)** is a complete census (survey of the entire population) of people aged 18 and over in Representaville, USA.
+
+## Looking at our `census` data, calculate the proportion of employed people that changed jobs over the pandemic.
+
+-   Start by inserting a chunk.\
+-   Filter appropriately.\
+-   Do the calculation.\
+-   Save as an atomic variable with as.numeric().
+
+```{r}
+
+
+```
+
+21% of employed people, 18+ in Representaville, USA changed their employers over the course of the pandemic. This is our parameter, because in **teaching world** we have stats super powers!
+
+## Using the census data set, produce (i) a table of counts for every grouping of the levels of `q11` and `changed_employers_q12c`(ii) a relevant visualization (with an appropriate title). DON'T filter the data first.
+
+```{r, fig.height = 4}
+
+```
+
+## Select a random sample of size n=10 (without replacement) from the census data and calculate the proportion of employed people that changed employers. Recreate the visualization above for your new data. Set the seed as the last *three* digits of your student ID number.
+
+```{r, fig.height = 4}
+
+```
+
+## Now, select a random sample of size n=100 (without replacement) from the census data and again pand calculate the proportion of employed people that changed employers. Set the seed as the last *three* digits of your student ID number.
+
+```{r, fig.height = 4}
+
+```
+
+\newpage
+
+## Estimate and plot the sampling distribution for the proportion of employed people who changed employers by taking 1000 samples of (i) size n=10 and (ii) size n=100 from the population data and produce appropriate data summaries for each. Set the seed as the last *THREE* digits of your student number for each set of simulations. That is, there should be two graphs and two summary tables, one for each sample size.
+
+```{r, cache = TRUE, fig.height=2}
+## (i) 
+n <- 
+repetitions <- 
+set.seed(123)
+sim10 <- rep(NA, repetitions)
+
+for (i in 1:repetitions)
+{
+  new_sim <- census %>% 
+    sample_n(size = n, replace = FALSE) # TEACHING WORLD!
+  
+  sim_prop<- new_sim %>% 
+      filter(q11 == "Employed full time" | q11 == "Employed part-time") %>% 
+      mutate(changed = changed_employers_q12c == "Yes") %>% 
+      summarise(prop = mean(changed)) %>% 
+      as.numeric()
+  sim10[i] <- sim_prop
+}
+
+sim10 <- tibble(prop = sim10)
+
+sim10 %>% ggplot(aes(x = prop)) +
+  geom_histogram(bins = 50, colour = "black", fill = "grey") +
+  labs(x="Sample proportions for samples of size 10") +
+  theme_minimal()
+
+# this is a fast version of the tables you've learned for a single vector
+summary(sim10$prop)
+```
+
+\newpage
+```{r, cache = T, fig.height=2}
+## (ii) 
+
+```
+
+#### CLASS QUESTION: Why is a histogram appropriate here when we were using bar graphs before?
+
+\newpage
+
+# Real world
+
+It is actually very hard to get a census of a whole town (why many countries only run their census every 10 years and why they cost so much!), so let's suppose we only have the sample of 500 (`orig_sample`). That is still a pretty big random sample!
+
+## Simulate 1000 bootstrap samples and calculate the proportion of employed people (18+) who changed employers over the course of the pandemic, in Representaville, USA. Set the seed as the last *three* digits of your student number.
+
+```{r, cache = TRUE, fig.height=2}
+# What is our true sample size, if we're just focusing on the employed people?
+sample_size <- orig_sample %>% 
+  filter(q11 == "Employed full time" | q11 == "Employed part-time") %>% 
+  count() %>% 
+  as.numeric()
+
+sample_size
+
+set.seed(123) # change to the last three digits of your student number
+repetitions <- 1000
+
+set.seed(123) # change to the last three digits of your student number
+repetitions <- 
+sample_size <- 
+
+boot_p <- rep(NA, repetitions)  # where we'll store the bootstrap proportions
+ 
+for (i in 1:repetitions)
+{
+  boot_samp <- # what goes here?
+  # REAL WOLRD!! 
+  # THIS is a bootstrap sample!!!
+  
+  boot_p[i]  <- 
+}
+
+boot_p <- tibble(boot_p)
+
+ggplot(boot_p, aes(x=boot_p)) + geom_histogram(binwidth=0.02, fill="gray", color="black") + 
+  labs(x="Proportions from bootstrap samples",
+    title="Bootstrap distribution of the proportion of employed people (18+) who\nchanged employers over the course of the pandemic, in Representaville") +
+  theme_minimal()
+```
+
+## Calculate a 95% confidence interval for the proportion of employed people (18+) who changed employers over the course of the pandemic, in Representaville, USA.
+
+```{r}
+
+
+```
+
+## Does your interval capture the true value we calculated earlier?
+
+
+## Could I filter to just employed people before resampling? Would I need to change anything about my set up?
+
+
+## Hypothesis test recap and connection!
+
+Let's suppose we saw the stat in the NPR report that "21% of workers have changed employers since the COVID-19 outbreak began" and wanted to test if that was the case in Representaville, USA. (We happen to know it is, in fact, true, as we were basically all knowing stats gods in the first part of this demo.)
+
+Let's perform a hypothesis test (Module 4!) to look into this. 
+
+$$ H_0: p_{\text{changed | employed}} = 0.21 $$
+$$ H_A: p_{\text{changed | employed}} \neq 0.21 $$
+
+_Note: You can read $\text{changed | employed}$ as "changed given employed". This symbol is (annoyingly?) also called a 'pipe' but is very different to the pipe we use from tidyverse %>%, and also, in the art sense, "ceci n'est pas une pipe"..._
+
+__Before we do our test, based on our confidence interval, do you think we'll have evidence against your null hypothesis?__
+
+```{r, cache=TRUE, fig.height=2}
+# What is our true sample size, if we're just focusing on the employed people?
+sample_size <- orig_sample %>% 
+  filter(q11 == "Employed full time" | q11 == "Employed part-time") %>% 
+  count() %>% 
+  as.numeric()
+
+sample_size
+
+# What is our test statistic?
+test_stat <- orig_sample %>% 
+  filter(q11 == "Employed full time" | q11 == "Employed part-time") %>% 
+  mutate(changed = changed_employers_q12c == "Yes") %>% 
+  summarise(prop = mean(changed)) %>% 
+  as.numeric()
+
+# Do the simulation
+set.seed(123)
+sim_stat <- rep(NA, 1000)
+
+for(i in 1:1000){
+  
+  sim <- ##### Let's complete this together
+    # Why is replace TRUE here?
+  
+  sim_stat[i] <- sim %>% 
+    mutate(changed_logical = changed == "Yes") %>% 
+    summarise(prop = mean(changed_logical)) %>% 
+    as.numeric()
+  
+}
+
+# Covert to tibble for easy plotting
+simulated_stats <- tibble(sim_stat = sim_stat)
+
+# Plot
+simulated_stats %>% 
+  ggplot(aes(x = sim_stat)) +
+  geom_histogram(bins=50, fill="grey", color="black") +
+  theme_minimal() +
+  geom_vline(xintercept = test_stat, color = "blue") +
+  geom_vline(xintercept = 0.21-(test_stat-0.21), color="red") +
+  labs(title = "Simualted statistics (under the null hypothesis) for the proportion of \nemployed people (18+) in Representaville, USA who changed employers \nover the course of the pandemic",
+       x = "Simulated proportions under the null hypothesis.")
+
+# Calculate p-value
+p_val <- simulated_stats %>% 
+  filter(sim_stat <= 0.21-(test_stat-0.21) | sim_stat >= test_stat) %>% 
+  summarise(n()/1000) %>% 
+  as.numeric()
+ 
+p_val
+```
